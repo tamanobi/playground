@@ -1,0 +1,17 @@
+---
+
+myusers:
+  - name: macaron
+    groups: dev,sudo,docker
+  - name: ange
+    groups: dev,admin,sudo
+  - name: etoile
+    groups: dev,sudo
+
+mygroups:
+  - dev
+  - admin
+  - sudo
+  - docker
+
+ansible_python_interpreter: /usr/bin/python3

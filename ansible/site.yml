@@ -1,0 +1,29 @@
+- hosts: vagrant
+  become: yes
+  gather_facts: no
+  remote_user: vagrant
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: install packages
+      apt:
+        name: "{{ item }}"
+        update_cache: yes
+        state: present
+      with_items:
+        - python
+        - htop
+        - docker
+    - name: create groups
+      group:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ mygroups }}"
+    - name: show debug messages
+      user:
+        name: "{{ item.name }}"
+        groups: "{{ item.groups }}"
+        state: present
+        createhome: yes
+        shell: /bin/bash
+      with_items: "{{ myusers }}"
