@@ -1,0 +1,13 @@
+{
+  "name": "sample_test",
+  "description": "E2E test using testcafe",
+  "scripts": {
+    "test": "node runner.js"
+  },
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "node-static": "^0.7.9",
+    "testcafe": "^0.15.0",
+    "testcafe-browser-provider-browserstack": "^1.1.1"
+  }
+}
