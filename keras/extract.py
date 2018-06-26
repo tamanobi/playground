@@ -3,7 +3,7 @@ from keras.preprocessing import image
 from keras.applications.vgg16 import preprocess_input
 import numpy as np
 
-model = VGG16(weights='imagenet', include_top=False)
+model = VGG16(weights='imagenet', include_top=False, pooling='avg')
 
 img_path = 'elephant.jpg'
 img = image.load_img(img_path, target_size=(224, 224))
@@ -12,4 +12,4 @@ x = np.expand_dims(x, axis=0)
 x = preprocess_input(x)
 
 features = model.predict(x)
-print(features)
+print(features.shape)
