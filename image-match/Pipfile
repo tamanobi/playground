@@ -8,9 +8,10 @@ pylint = "*"
 
 [packages]
 numpy = "*"
-image-match = "*"
-elasticsearch = "==6.3.0"
 requests = "*"
+pytest = "*"
+elasticsearch = "==6.3.0"
+"c084e0c" = {path = "./image-match"}
 
 [requires]
 python_version = "3.6"
