@@ -5,6 +5,7 @@ from pixiv.collector import getYmdStringListUntilLastYear
 import os
 import glob
 import urllib
+import requests
 from elasticsearch import Elasticsearch
 from image_match.elasticsearch_driver import SignatureES
 
@@ -40,7 +41,11 @@ for i, url in enumerate(urls):
     })
     if (r['hits']['total'] == 0):
         try:
-            requests.get(url, headers={'referer': 'https://www.pixiv.net/', 'user-agent': 'yasu(similarity image search)'}))
+            requests.get(url, headers={
+                'referer': 'https://www.pixiv.net/',
+                'user-agent': 'similarity image search'
+                }
+            )
             ses.add_image(url, metadata=meta)
         except urllib.error.HTTPError as err:
             if err.code == 403 or err.code == 404:
