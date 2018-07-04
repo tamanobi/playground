@@ -41,11 +41,6 @@ for i, url in enumerate(urls):
     })
     if (r['hits']['total'] == 0):
         try:
-            requests.get(url, headers={
-                'referer': 'https://www.pixiv.net/',
-                'user-agent': 'similarity image search'
-                }
-            )
             ses.add_image(url, metadata=meta)
         except urllib.error.HTTPError as err:
             if err.code == 403 or err.code == 404:
