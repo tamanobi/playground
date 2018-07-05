@@ -51,6 +51,8 @@ chisq_p.values <- function (d) {
   p.values <- c()
   p_sex <- c()
   p_agegroup <- c()
+  p_nonclick <- c()
+  p_click <- c()
   ctr <- c()
   for (i in 1:nrow(x)) {
     y <- rbind(x[i,3:4], x[-i,3:4] %>% summarize(nonclick=sum(nonclick), click=sum(click)))
@@ -58,6 +60,8 @@ chisq_p.values <- function (d) {
     p_agegroup <- append(p_agegroup, sapply(x[i, 2], as.character))
     ctr <- append(ctr, sapply(x[i, 5], as.double))
     p.values <- append(p.values, chisq.test(y)$p.value)
+    p_nonclick <- append(p_nonclick, x[i, 3])
+    p_click <- append(p_click, x[i, 4])
   }
   x <- d %>% group_by(sex, click) %>% summarise(count=n()) %>% spread(click, count)
   colnames(x) <- c('sex', 'nonclick', 'click')
@@ -68,6 +72,8 @@ chisq_p.values <- function (d) {
     p_agegroup <- append(p_agegroup, '*')
     p.values <- append(p.values, chisq.test(y)$p.value)
     ctr <- append(ctr, sapply(x[i, 4], as.double))
+    p_nonclick <- append(p_nonclick, x[i, 2])
+    p_click <- append(p_click, x[i, 3])
   }
 
   x <- d %>% group_by(agegroup, click) %>% summarise(count=n()) %>% spread(click, count)
@@ -79,9 +85,11 @@ chisq_p.values <- function (d) {
     p_agegroup <- append(p_agegroup, sapply(x[i, 1], as.character))
     p.values <- append(p.values, chisq.test(y)$p.value)
     ctr <- append(ctr, sapply(x[i, 4], as.double))
+    p_nonclick <- append(p_nonclick, x[i, 2])
+    p_click <- append(p_click, x[i, 3])
   }
 
-  return(data.frame(sex=p_sex, agegroup=p_agegroup, p.values, ctr) %>% mutate(
+  return(data.frame(sex=p_sex, agegroup=p_agegroup, p.values, click=p_click, ctr) %>% mutate(
     mark=case_when(p.values < 0.01 ~ '**'
                    , p.values < 0.05 ~ '*'
                    , p.values < 0.01 ~ '+'
