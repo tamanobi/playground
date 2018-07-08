@@ -10,30 +10,36 @@ illust_vector_list = []
 dim = 512
 t = AnnoyIndex(dim)  # Length of item vector that will be indexed
 path = '../keras/pixiv-ranking-features.txt'
+
 with open(path, 'r') as f:
     i = 0
     line = f.readline()
     while line:
         js = json.loads(line)
+        print(js['illust_id'])
         illust_vector_list.append(js)
-        print(i)
-        if i > 1e6:
+        if i > 1e3:
             break
         i = i + 1
+        line = f.readline()
 
 for i, illust_vector in enumerate(illust_vector_list):
-    print(i)
-    if not redis_client.exists(str(i)):
-        redis_client.set(str(i), illust_vector['illust_id'])
-    try:
-        t.get_item_vector(i)
-    except IndexError as err:
-        t.add_item(i, illust_vector['features'])
+    illust_id = illust_vector['illust_id']
+
+    line2illustId = f"line2illustId_{i}"
+    illustId2line = f"illustId2line_{illust_id}"
+    print(f"{line2illustId} -> {illustId2line}")
+    redis_client.delete(line2illustId)
+    redis_client.delete(illustId2line)
+    if not redis_client.exists(line2illustId):
+        # 本当はトランザクションを貼りたい
+        redis_client.set(line2illustId, illust_vector['illust_id'])
+        redis_client.set(illustId2line, str(i))
+        try:
+            t.get_item_vector(i)
+        except IndexError as err:
+            t.add_item(i, illust_vector['features'])
 
 t.build(100) # 100 trees
 if t.get_n_items() > 0:
     t.save('pixiv-ranking.ann')
-
-#u = AnnoyIndex(dim)
-#u.load('test.ann') # super fast, will just mmap the file
-#print(u.get_nns_by_item(i=0, n=10, search_k=-1, include_distances=False)) # will find the 1000 nearest neighbors
