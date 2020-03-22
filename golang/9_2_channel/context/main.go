@@ -7,11 +7,19 @@ import (
 )
 
 // heavyFunc はキャンセル可能な長時間かかる処理
-func heavyFunc(ch <-chan struct{}) {
+func heavyFunc(cancel <-chan struct{}) {
+	ch := make(chan string)
+	go func() {
+		defer close(ch)
+		time.Sleep(1000 * time.Millisecond)
+		ch <- "終わったよ"
+	}()
+
 	select {
-	case <-time.After(3 * time.Second):
+	case message := <-ch:
 		fmt.Println("heavyFunc is done")
-	case <-ch:
+		fmt.Println(message)
+	case <-cancel:
 		fmt.Println("heavyFunc is cancelled")
 		return
 	}
@@ -24,7 +32,7 @@ func something(ctx context.Context) error {
 	select {
 	case <-ctx.Done():
 		fmt.Println("context is done.")
-		ch <- struct{}{}
+		close(ch)
 		return ctx.Err()
 	}
 }
