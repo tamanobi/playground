@@ -6,14 +6,12 @@ import (
 	"time"
 )
 
-type Runner interface {
-	Run()
-}
-
+// Job は自らの識別子をもったRunメソッドを持った存在
 type Job struct {
 	n int
 }
 
+// Run は1秒程度時間を要する処理を実行するメソッド
 func (j Job) Run() {
 	fmt.Printf("start %d job\n", j.n)
 	time.Sleep(1 * time.Second)
@@ -27,8 +25,8 @@ func parallel(n int, jobs []Job) {
 	for _, j := range jobs {
 		sem <- struct{}{}
 		wg.Add(1)
-		go func(j Job) {
-			j.Run()
+		go func(job Job) {
+			job.Run()
 			<-sem
 			wg.Done()
 		}(j)
